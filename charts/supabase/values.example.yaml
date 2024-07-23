@@ -28,16 +28,24 @@ db:
         - postgres
     initialDelaySeconds: 3
   persistence:
-    enabled: false
+    enabled: true
+    storageClassName: 'db-test-storage'
+    annotations: {}
+    size: 8Gi
+    accessModes:
+      - ReadWriteOnce
 
 studio:
   image:
     tag: 20240326-5e5586d
+  service:
+    type: LoadBalancer
+    port: 3000
   environment:
-    STUDIO_DEFAULT_ORGANIZATION: "My Organization"
-    STUDIO_DEFAULT_PROJECT: "My Project"
-    SUPABASE_PUBLIC_URL: http://example.com/
-    NEXT_PUBLIC_ENABLE_LOGS: "true"
+    STUDIO_DEFAULT_ORGANIZATION: 'AMN Test Organization'
+    STUDIO_DEFAULT_PROJECT: 'My AMN Test Project'
+    SUPABASE_PUBLIC_URL: http://k8s-studio-imac.ahemen.nl
+    NEXT_PUBLIC_ENABLE_LOGS: 'true'
   livenessProbe:
     httpGet:
       path: /api/profile
@@ -50,12 +58,12 @@ auth:
   environment:
     API_EXTERNAL_URL: http://example.com
     GOTRUE_SITE_URL: http://example.com
-    GOTRUE_EXTERNAL_EMAIL_ENABLED: "true"
-    GOTRUE_MAILER_AUTOCONFIRM: "true"
-    GOTRUE_SMTP_ADMIN_EMAIL: "your-mail@example.com"
-    GOTRUE_SMTP_HOST: "smtp.example.com"
-    GOTRUE_SMTP_PORT: "587"
-    GOTRUE_SMTP_SENDER_NAME: "your-mail@example.com"
+    GOTRUE_EXTERNAL_EMAIL_ENABLED: 'true'
+    GOTRUE_MAILER_AUTOCONFIRM: 'true'
+    GOTRUE_SMTP_ADMIN_EMAIL: 'your-mail@example.com'
+    GOTRUE_SMTP_HOST: 'smtp.example.com'
+    GOTRUE_SMTP_PORT: '587'
+    GOTRUE_SMTP_SENDER_NAME: 'your-mail@example.com'
 
 rest:
   image:
@@ -83,13 +91,13 @@ storage:
       port: 5000
     initialDelaySeconds: 3
   persistence:
-    enabled: false
+    enabled: true
 
 imgproxy:
   image:
     tag: v3.8.0
   environment:
-    IMGPROXY_ENABLE_WEBP_DETECTION: "true"
+    IMGPROXY_ENABLE_WEBP_DETECTION: 'true'
   livenessProbe:
     exec:
       command:
@@ -108,10 +116,11 @@ kong:
     KONG_LOG_LEVEL: info
   ingress:
     enabled: true
-    className: "nginx"
+    className: 'nginx'
     annotations:
       nginx.ingress.kubernetes.io/rewrite-target: /
-    tls: []
+    tls:
+      []
       # - secretName: example-ingress-tls
       #   hosts:
       #     - example.com
